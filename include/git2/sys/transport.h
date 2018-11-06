@@ -226,7 +226,10 @@ GIT_EXTERN(int) git_transport_smart(
  * @param cert the certificate to pass to the caller
  * @param valid whether we believe the certificate is valid
  * @param hostname the hostname we connected to
- * @return the return value of the callback
+ * @return the return value of the callback: 0 for no error, <0 for an
+ *         error, or >0 if there is no callback registered or the callback
+ *         chose not to behave as if there were no callback and did not
+ *         validate this certificate
  */
 GIT_EXTERN(int) git_transport_smart_certificate_check(git_transport *transport, git_cert *cert, int valid, const char *hostname);
 
@@ -237,7 +240,10 @@ GIT_EXTERN(int) git_transport_smart_certificate_check(git_transport *transport, 
  * @param transport a smart transport
  * @param user the user we saw on the url (if any)
  * @param methods available methods for authentication
- * @return the return value of the callback
+ * @return the return value of the callback: 0 for no error, <0 for an
+ *         error, or >0 if there is no callback registered or the callback
+ *         chose not to behave as if there were no callback and did not
+ *         provide credentials
  */
 GIT_EXTERN(int) git_transport_smart_credentials(git_cred **out, git_transport *transport, const char *user, int methods);
 
