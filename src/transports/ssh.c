@@ -448,9 +448,12 @@ static int request_creds(git_cred **out, ssh_subtransport *t, const char *user, 
 						  t->owner->cred_acquire_payload);
 
 		if (error == GIT_PASSTHROUGH)
-			no_callback = 1;
-		else if (error < 0)
+			error = 1;
+
+		if (error < 0)
 			return error;
+		else if (error > 0)
+			no_callback = 1;
 		else if (!cred) {
 			giterr_set(GITERR_SSH, "callback failed to initialize SSH credentials");
 			return -1;
@@ -584,6 +587,11 @@ post_extract:
 		cert_ptr = &cert;
 
 		error = t->owner->certificate_check_cb((git_cert *) cert_ptr, 0, host, t->owner->message_cb_payload);
+
+		/* If the callback chose not to act, fail this hostkey */
+		if (error > 0)
+			error = GIT_ECERTIFICATE;
+
 		if (error < 0) {
 			if (!giterr_last())
 				giterr_set(GITERR_NET, "user cancelled hostkey check");

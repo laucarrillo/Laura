@@ -226,7 +226,9 @@ static int fallback_cred_acquire_cb(
 			return -1;
 		}
 
-		if (SUCCEEDED(CoInitializeEx(NULL, COINIT_MULTITHREADED))) {
+		hCoInitResult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+		if (SUCCEEDED(hCoInitResult) || hCoInitResult == RPC_E_CHANGED_MODE) {
 			IInternetSecurityManager* pISM;
 
 			/* And if the target URI is in the My Computer, Intranet, or Trusted zones */
@@ -289,6 +291,9 @@ static int certificate_check(winhttp_stream *s, int valid)
 	cert.len = cert_ctx->cbCertEncoded;
 	error = t->owner->certificate_check_cb((git_cert *) &cert, valid, t->connection_data.host, t->owner->message_cb_payload);
 	CertFreeCertificateContext(cert_ctx);
+
+	if (error > 0)
+		error = valid ? 0 : GIT_ECERTIFICATE;
 
 	if (error < 0 && !giterr_last())
 		giterr_set(GITERR_NET, "user cancelled certificate check");

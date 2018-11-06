@@ -367,11 +367,15 @@ static int on_headers_complete(http_parser *parser)
 								  allowed_auth_types,
 								  t->owner->cred_acquire_payload);
 
-				if (error == GIT_PASSTHROUGH) {
-					no_callback = 1;
-				} else if (error < 0) {
+				/* treat GIT_PASSTHROUGH as if callback isn't set */
+				if (error == GIT_PASSTHROUGH)
+					error = 1;
+
+				if (error < 0) {
 					t->error = error;
 					return t->parse_error = PARSE_ERROR_EXT;
+				} else if (error > 0) {
+					no_callback = 1;
 				} else {
 					assert(t->cred);
 
@@ -633,6 +637,9 @@ static int http_connect(http_subtransport *t)
 
 		giterr_clear();
 		error = t->owner->certificate_check_cb(cert, is_valid, t->connection_data.host, t->owner->message_cb_payload);
+
+		if (error > 0)
+			error = is_valid ? 0 : GIT_ECERTIFICATE;
 
 		if (error < 0) {
 			if (!giterr_last())
