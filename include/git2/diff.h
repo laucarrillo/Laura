@@ -258,12 +258,12 @@ typedef enum {
  * abbreviated to something reasonable, like 7 characters.
  */
 typedef struct {
-	git_oid     id;
-	const char *path;
-	git_off_t   size;
-	uint32_t    flags;
-	uint16_t    mode;
-	uint16_t    id_abbrev;
+	git_oid           id;
+	const char       *path;
+	git_object_size_t size;
+	uint32_t          flags;
+	uint16_t          mode;
+	uint16_t          id_abbrev;
 } git_diff_file;
 
 /**
@@ -414,10 +414,10 @@ typedef struct {
 
 	/**
 	 * A size (in bytes) above which a blob will be marked as binary
-	 * automatically; pass a negative value to disable.
+	 * automatically; pass `GIT_OBJECT_SIZE_MAX` to disable.
 	 * Defaults to 512MB.
 	 */
-	git_off_t   max_size;
+	git_object_size_t max_size;
 
 	/**
 	 * The virtual "directory" prefix for old file names in hunk headers.
@@ -603,7 +603,7 @@ typedef struct {
 	int    new_lineno;   /**< Line number in new file or -1 for deleted line */
 	int    num_lines;    /**< Number of newline characters in content */
 	size_t content_len;  /**< Number of bytes of data */
-	git_off_t content_offset; /**< Offset in the original file to the content */
+	git_object_size_t content_offset; /**< Offset in the original file to the content */
 	const char *content; /**< Pointer to diff text, not NUL-byte terminated */
 } git_diff_line;
 

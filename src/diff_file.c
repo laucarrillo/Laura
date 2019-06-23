@@ -46,7 +46,7 @@ static int diff_file_content_init_common(
 {
 	fc->opts_flags = opts ? opts->flags : GIT_DIFF_NORMAL;
 
-	if (opts && opts->max_size >= 0)
+	if (opts && (int64_t)opts->max_size >= 0)
 		fc->opts_max_size = opts->max_size ?
 			opts->max_size : DIFF_MAX_FILESIZE;
 
@@ -62,7 +62,7 @@ static int diff_file_content_init_common(
 	git_diff_driver_update_options(&fc->opts_flags, fc->driver);
 
 	/* make sure file is conceivable mmap-able */
-	if ((git_off_t)((size_t)fc->file->size) != fc->file->size)
+	if ((size_t)fc->file->size != fc->file->size)
 		fc->file->flags |= GIT_DIFF_FLAG_BINARY;
 	/* check if user is forcing text diff the file */
 	else if (fc->opts_flags & GIT_DIFF_FORCE_TEXT) {

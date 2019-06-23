@@ -160,7 +160,7 @@ static int git_xdiff_cb(void *priv, mmbuffer_t *bufs, int len)
 		else if (line.origin == GIT_DIFF_LINE_DELETION)
 			line.content_offset = bufs[1].ptr - info->xd_old_data.ptr;
 		else
-			line.content_offset = -1;
+			line.content_offset = GIT_OBJECT_SIZE_MAX;
 
 		output->error = diff_update_lines(
 			info, &line, bufs[1].ptr, bufs[1].size);
@@ -181,7 +181,7 @@ static int git_xdiff_cb(void *priv, mmbuffer_t *bufs, int len)
 			(*bufs[0].ptr == '-') ? GIT_DIFF_LINE_ADD_EOFNL :
 			GIT_DIFF_LINE_CONTEXT_EOFNL;
 
-		line.content_offset = -1;
+		line.content_offset = GIT_OBJECT_SIZE_MAX;
 
 		output->error = diff_update_lines(
 			info, &line, bufs[2].ptr, bufs[2].size);

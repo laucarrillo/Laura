@@ -125,7 +125,7 @@ int git_attr_file__load(
 		break;
 	case GIT_ATTR_FILE__FROM_INDEX: {
 		git_oid id;
-		git_off_t blobsize;
+		git_object_size_t blobsize;
 
 		if ((error = attr_file_oid_from_index(&id, repo, entry->path)) < 0 ||
 			(error = git_blob_lookup(&blob, repo, &id)) < 0)
