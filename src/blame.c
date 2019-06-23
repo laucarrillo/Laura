@@ -268,7 +268,7 @@ static git_blame_hunk *split_hunk_in_vector(
 static int index_blob_lines(git_blame *blame)
 {
     const char *buf = blame->final_buf;
-    git_off_t len = blame->final_buf_size;
+    size_t len = blame->final_buf_size;
     int num = 0, incomplete = 0, bol = 1;
     size_t *i;
 
