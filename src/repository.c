@@ -2540,7 +2540,7 @@ int git_repository_hashfile(
 	int error;
 	git_filter_list *fl = NULL;
 	git_file fd = -1;
-	git_off_t len;
+	git_object_size_t len;
 	git_buf full_path = GIT_BUF_INIT;
 
 	assert(out && path && repo); /* as_path can be NULL */
@@ -2577,11 +2577,8 @@ int git_repository_hashfile(
 		goto cleanup;
 	}
 
-	len = git_futils_filesize(fd);
-	if (len < 0) {
-		error = (int)len;
+	if ((error = git_futils_filesize(&len, fd)) < 0)
 		goto cleanup;
-	}
 
 	if (!git__is_sizet(len)) {
 		git_error_set(GIT_ERROR_OS, "file size overflow for 32-bit systems");
