@@ -60,7 +60,32 @@ run_test() {
 		RUNNER="$TEST_CMD"
 	fi
 
-	eval $RUNNER || failure
+	if [[ "$GITTEST_FLAKY_RETRY" > 0 ]]; then
+		ATTEMPTS_REMAIN=$GITTEST_FLAKY_RETRY
+	else
+		ATTEMPTS_REMAIN=1
+	fi
+
+	while [[ "$ATTEMPTS_REMAIN" > 0 ]]; do
+		if [ "$FAILED" -eq 1 ]; then
+			echo ""
+			echo "Re-running flaky ${1} tests..."
+			echo ""
+		fi
+
+		FAILED=0
+		eval $RUNNER || FAILED=1 && true
+
+		if [ "$FAILED" -eq 0 ]; then
+			break
+		fi
+
+		ATTEMPTS_REMAIN="$(($ATTEMPTS_REMAIN-1))"
+	done
+
+	if [ "$FAILED" -ne 0 ]; then
+		SUCCESS=0
+	fi
 }
 
 # Configure the test environment; run them early so that we're certain
@@ -166,7 +191,9 @@ if [ -z "$SKIP_ONLINE_TESTS" ]; then
 	echo "## Running (online) tests"
 	echo "##############################################################################"
 
+	export GITTEST_FLAKY_RETRY=5
 	run_test online
+	unset GITTEST_FLAKY_RETRY
 fi
 
 if [ -z "$SKIP_GITDAEMON_TESTS" ]; then
